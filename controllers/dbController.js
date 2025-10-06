@@ -3,13 +3,15 @@
  * Each method interacts with the database and handles errors gracefully.
  */
 const getModel = require("../models/dynamicModel");
+const { convertDateStrings } = require("../utils/typeHelper");
 
 class DbController {
   async insertOne(req, res) {
     const { database, collection, document } = req.body;
     try {
       const Model = getModel(database, collection);
-      const result = await Model.insertOne(document);
+      const processedDocument = convertDateStrings(document);
+      const result = await Model.insertOne(processedDocument);
       if (!result) {
         return res.status(400).json({ success: false, message: "Insertion failed" });
       }
