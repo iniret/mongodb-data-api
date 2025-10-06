@@ -45,6 +45,12 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
+# Test files and directories
+test/
+tests/
+*.test.js
+test-*.js
+
 # IDE files
 .vscode/
 .idea/

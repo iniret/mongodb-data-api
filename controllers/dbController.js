@@ -67,7 +67,9 @@ class DbController {
     const { database, collection, filter, update, upsert } = req.body;
     try {
       const Model = getModel(database, collection);
-      const result = await Model.updateOne(filter, update, { upsert });
+      const processedFilter = convertDateStrings(filter);
+      const processedUpdate = convertDateStrings(update);
+      const result = await Model.updateOne(processedFilter, processedUpdate, { upsert });
       if (result.matchedCount === 0) {
         return res.status(404).json({ success: false, message: "No records updated" });
       }
@@ -81,7 +83,9 @@ class DbController {
     const { database, collection, filter, update } = req.body;
     try {
       const Model = getModel(database, collection);
-      const result = await Model.updateMany(filter, update);
+      const processedFilter = convertDateStrings(filter);
+      const processedUpdate = convertDateStrings(update);
+      const result = await Model.updateMany(processedFilter, processedUpdate);
       if (result.matchedCount === 0) {
         return res.status(404).json({ success: false, message: "No records updated" });
       }

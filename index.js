@@ -34,6 +34,12 @@ app.use(cors({
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Health check endpoint (before auth middleware)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 // API Key Authentication Middleware
 app.use((req, res, next) => {
   logger.info({
@@ -50,12 +56,9 @@ app.use((req, res, next) => {
     res.status(403).json({ message: "Forbidden: Invalid API Key or Secret" });
   }
 });
+
 // API Routes
 app.use("/api", apiRoutes);
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
-});
 
 // Start Server
 const PORT = process.env.PORT || 3000;
