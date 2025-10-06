@@ -12,6 +12,10 @@ const API_KEY = process.env.API_KEY; // Load API key from .env
 const API_SECRET = process.env.API_SECRET; // Load API secret from .env
 
 const app = express();
+
+// Trust proxy - needed when behind reverse proxy/load balancer
+app.set('trust proxy', true);
+
 // Middleware for rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10), // 15 minutes
