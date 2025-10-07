@@ -70,9 +70,21 @@ class DbController {
       const processedFilter = convertDateStrings(filter);
       const processedUpdate = convertDateStrings(update);
       const result = await Model.updateOne(processedFilter, processedUpdate, { upsert });
-      if (result.matchedCount === 0) {
-        return res.status(404).json({ success: false, message: "No records updated" });
+      
+      // Check if any document was matched and potentially modified
+      if (result.matchedCount === 0 && !result.upsertedCount) {
+        return res.status(404).json({ success: false, message: "No records found to update" });
       }
+      
+      // If matched but not modified, it means the document already had the same values
+      if (result.matchedCount > 0 && result.modifiedCount === 0 && !result.upsertedCount) {
+        return res.status(200).json({ 
+          success: true, 
+          result, 
+          message: "Document found but no changes were needed (values already match)" 
+        });
+      }
+      
       res.status(200).json({ success: true, result });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -86,9 +98,19 @@ class DbController {
       const processedFilter = convertDateStrings(filter);
       const processedUpdate = convertDateStrings(update);
       const result = await Model.updateMany(processedFilter, processedUpdate);
+      
       if (result.matchedCount === 0) {
-        return res.status(404).json({ success: false, message: "No records updated" });
+        return res.status(404).json({ success: false, message: "No records found to update" });
       }
+      
+      if (result.matchedCount > 0 && result.modifiedCount === 0) {
+        return res.status(200).json({ 
+          success: true, 
+          result, 
+          message: "Documents found but no changes were needed (values already match)" 
+        });
+      }
+      
       res.status(200).json({ success: true, result });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
