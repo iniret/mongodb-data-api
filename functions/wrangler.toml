@@ -1,0 +1,13 @@
+name = "beacon-worker"
+main = "beacon.js"
+compatibility_date = "2024-10-01"
+
+[env.production]
+vars = { DATA_API_URL = "https://your-data-api-domain.com" }
+
+[env.development]
+vars = { DATA_API_URL = "http://localhost:7438" }
+
+# Environment variables (set these using wrangler secret put)
+# API_KEY - Your Data API key
+# Example: wrangler secret put API_KEY

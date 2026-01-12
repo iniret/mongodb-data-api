@@ -7,9 +7,9 @@ const { convertDateStrings } = require("../utils/typeHelper");
 
 class DbController {
   async insertOne(req, res) {
-    const { database, collection, document } = req.body;
+    const { database, collection, document, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const processedDocument = convertDateStrings(document);
       const result = await Model.insertOne(processedDocument);
       if (!result) {
@@ -22,9 +22,9 @@ class DbController {
   }
 
   async insertMany(req, res) {
-    const { database, collection, documents } = req.body;
+    const { database, collection, documents, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const result = await Model.insertMany(documents);
       if (!result || result.length === 0) {
         return res.status(400).json({ success: false, message: "Insertion failed" });
@@ -36,9 +36,9 @@ class DbController {
   }
 
   async findOne(req, res) {
-    const { database, collection, filter, projection } = req.body;
+    const { database, collection, filter, projection, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const result = await Model.findOne(filter, projection);
       if (!result) {
         return res.status(404).json({ success: false, message: "No record found" });
@@ -50,9 +50,9 @@ class DbController {
   }
 
   async find(req, res) {
-    const { database, collection, filter, projection, sort, limit } = req.body;
+    const { database, collection, filter, projection, sort, limit, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const result = await Model.find(filter, projection).sort(sort).limit(limit);
       if (!result || result.length === 0) {
         return res.status(404).json({ success: false, message: "No records found" });
@@ -64,9 +64,9 @@ class DbController {
   }
 
   async updateOne(req, res) {
-    const { database, collection, filter, update, upsert } = req.body;
+    const { database, collection, filter, update, upsert, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const processedFilter = convertDateStrings(filter);
       const processedUpdate = convertDateStrings(update);
       const result = await Model.updateOne(processedFilter, processedUpdate, { upsert });
@@ -92,9 +92,9 @@ class DbController {
   }
 
   async updateMany(req, res) {
-    const { database, collection, filter, update } = req.body;
+    const { database, collection, filter, update, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const processedFilter = convertDateStrings(filter);
       const processedUpdate = convertDateStrings(update);
       const result = await Model.updateMany(processedFilter, processedUpdate);
@@ -118,9 +118,9 @@ class DbController {
   }
 
   async deleteOne(req, res) {
-    const { database, collection, filter } = req.body;
+    const { database, collection, filter, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const result = await Model.deleteOne(filter);
       if (result.deletedCount === 0) {
         return res.status(404).json({ success: false, message: "No records deleted" });
@@ -132,9 +132,9 @@ class DbController {
   }
 
   async deleteMany(req, res) {
-    const { database, collection, filter } = req.body;
+    const { database, collection, filter, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const result = await Model.deleteMany(filter);
       if (result.deletedCount === 0) {
         return res.status(404).json({ success: false, message: "No records deleted" });
@@ -146,9 +146,9 @@ class DbController {
   }
 
   async aggregate(req, res) {
-    const { database, collection, pipeline } = req.body;
+    const { database, collection, pipeline, cluster } = req.body;
     try {
-      const Model = getModel(database, collection);
+      const Model = getModel(database, collection, cluster);
       const result = await Model.aggregate(pipeline);
       if (!result || result.length === 0) {
         return res.status(404).json({ success: false, message: "No aggregation results found" });

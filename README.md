@@ -7,6 +7,7 @@ With the deprecation of the Atlas Data API, developers need an alternative solut
 
 ## Features
 - **CRUD Operations**: Supports `insertOne`, `insertMany`, `findOne`, `find`, `updateOne`, `updateMany`, `deleteOne`, `deleteMany`, and `aggregate`.
+- **Multi-Cluster Support**: Connect to multiple MongoDB clusters by specifying a cluster identifier in requests.
 - **Type Conversion**: Automatically converts MongoDB extended JSON formats (`$date`, `$oid`) and ISO date strings to proper MongoDB types.
 - **Security**: Uses API key and secret validation.
 - **Rate Limiting**: Protects against abuse with configurable request limits.
@@ -22,7 +23,15 @@ With the deprecation of the Atlas Data API, developers need an alternative solut
 
 ```ini
 PORT=7438
+
+# Default MongoDB cluster
 MONGO_URI="<MONGO_URI>"
+MONGO_OPTIONS="?retryWrites=true&w=majority"
+
+# Additional clusters (optional)
+MONGO_URI_CLUSTER1="<CLUSTER1_URI>"
+MONGO_OPTIONS_CLUSTER1="?retryWrites=true&w=majority"
+
 API_KEY="<API_KEY>"
 API_SECRET="<API_SECRET>"
 RATE_LIMIT_WINDOW_MS=900000 # 15 minutes in milliseconds
@@ -72,6 +81,38 @@ npm run dev
 
 ---
 
+## Multi-Cluster Configuration
+
+The service supports connecting to multiple MongoDB clusters. Configure additional clusters in your `.env` file:
+
+```ini
+# Default cluster (used when no cluster parameter is specified)
+MONGO_URI="mongodb+srv://user:pass@cluster0.mongodb.net"
+MONGO_OPTIONS="?retryWrites=true&w=majority"
+
+# Additional clusters
+MONGO_URI_PRODUCTION="mongodb+srv://user:pass@prod-cluster.mongodb.net"
+MONGO_OPTIONS_PRODUCTION="?retryWrites=true&w=majority"
+
+MONGO_URI_STAGING="mongodb+srv://user:pass@staging-cluster.mongodb.net"
+MONGO_OPTIONS_STAGING="?retryWrites=true&w=majority"
+```
+
+To use a specific cluster, add the `cluster` parameter to your request body:
+
+```json
+{
+  "cluster": "production",
+  "database": "mydb",
+  "collection": "users",
+  "filter": { "status": "active" }
+}
+```
+
+If no `cluster` parameter is provided, the default `MONGO_URI` will be used.
+
+---
+
 ## API Endpoints
 
 ### Insert One Document
@@ -81,6 +122,20 @@ curl -X POST http://localhost:7438/api/insertOne \
 -H "x-api-key: your_api_key_here" \
 -H "x-api-secret: your_api_secret_here" \
 -d '{
+  "database": "sample_db",
+  "collection": "sample_collection",
+  "document": { "key": "value" }
+}'
+```
+
+**With specific cluster:**
+```sh
+curl -X POST http://localhost:7438/api/insertOne \
+-H "Content-Type: application/json" \
+-H "x-api-key: your_api_key_here" \
+-H "x-api-secret: your_api_secret_here" \
+-d '{
+  "cluster": "production",
   "database": "sample_db",
   "collection": "sample_collection",
   "document": { "key": "value" }

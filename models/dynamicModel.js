@@ -13,11 +13,12 @@ const modelsCache = {}; // Cache for models (database.collection -> Model)
  * 
  * @param {string} database - The name of the database.
  * @param {string} collection - The name of the collection.
+ * @param {string} cluster - The cluster identifier (optional).
  * @returns {mongoose.Model} - The Mongoose model instance for the specified collection.
  */
-const getModel = (database, collection) => {
-  // Create a unique key for the model based on the database and collection names
-  const modelKey = `${database}.${collection}`;
+const getModel = (database, collection, cluster = null) => {
+  // Create a unique key for the model based on cluster, database and collection names
+  const modelKey = cluster ? `${cluster}.${database}.${collection}` : `${database}.${collection}`;
 
   // Check if the model already exists in the cache
   // If it does, return the cached model
@@ -25,8 +26,8 @@ const getModel = (database, collection) => {
     return modelsCache[modelKey];
   }
 
-  // Get the database connection for the specified database
-  const dbConnection = getDatabaseConnection(database);
+  // Get the database connection for the specified database and cluster
+  const dbConnection = getDatabaseConnection(database, cluster);
 
   // Define a flexible schema with no predefined structure
   // This allows the schema to accept any fields

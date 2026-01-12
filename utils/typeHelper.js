@@ -24,6 +24,10 @@ const convertDateStrings = (obj) => {
     if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
       const date = new Date(value);
       result[key] = !isNaN(date.getTime()) ? date : value;
+    } else if (key === '_id' && typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value)) {
+      // Auto-convert 24-character hex strings to ObjectId for _id fields
+      const mongoose = require('mongoose');
+      result[key] = new mongoose.Types.ObjectId(value);
     } else if (typeof value === 'object' && value !== null) {
       result[key] = convertDateStrings(value);
     } else {
