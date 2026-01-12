@@ -48,7 +48,12 @@ const getDatabaseConnection = (database, cluster = null) => {
     const { uri, options } = getClusterConfig(cluster);
     
     connections[connectionKey] = mongoose.createConnection(
-      `${uri}/${database}${options}`
+      `${uri}/${database}${options}`,
+      {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        connectTimeoutMS: 10000,
+      }
     );
 
     // Handle connection errors
