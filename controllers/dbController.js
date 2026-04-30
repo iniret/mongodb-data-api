@@ -25,7 +25,8 @@ class DbController {
     const { database, collection, documents, cluster } = req.body;
     try {
       const Model = getModel(database, collection, cluster);
-      const result = await Model.insertMany(documents);
+      const processedDocuments = convertDateStrings(documents);
+      const result = await Model.insertMany(processedDocuments);
       if (!result || result.length === 0) {
         return res.status(400).json({ success: false, message: "Insertion failed" });
       }
@@ -39,7 +40,8 @@ class DbController {
     const { database, collection, filter, projection, cluster } = req.body;
     try {
       const Model = getModel(database, collection, cluster);
-      const result = await Model.findOne(filter, projection);
+      const processedFilter = convertDateStrings(filter);
+      const result = await Model.findOne(processedFilter, projection);
       if (!result) {
         return res.status(404).json({ success: false, message: "No record found" });
       }
@@ -53,7 +55,8 @@ class DbController {
     const { database, collection, filter, projection, sort, limit, cluster } = req.body;
     try {
       const Model = getModel(database, collection, cluster);
-      const result = await Model.find(filter, projection).sort(sort).limit(limit);
+      const processedFilter = convertDateStrings(filter);
+      const result = await Model.find(processedFilter, projection).sort(sort).limit(limit);
       if (!result || result.length === 0) {
         return res.status(404).json({ success: false, message: "No records found" });
       }
@@ -121,7 +124,8 @@ class DbController {
     const { database, collection, filter, cluster } = req.body;
     try {
       const Model = getModel(database, collection, cluster);
-      const result = await Model.deleteOne(filter);
+      const processedFilter = convertDateStrings(filter);
+      const result = await Model.deleteOne(processedFilter);
       if (result.deletedCount === 0) {
         return res.status(404).json({ success: false, message: "No records deleted" });
       }
@@ -135,7 +139,8 @@ class DbController {
     const { database, collection, filter, cluster } = req.body;
     try {
       const Model = getModel(database, collection, cluster);
-      const result = await Model.deleteMany(filter);
+      const processedFilter = convertDateStrings(filter);
+      const result = await Model.deleteMany(processedFilter);
       if (result.deletedCount === 0) {
         return res.status(404).json({ success: false, message: "No records deleted" });
       }
@@ -149,7 +154,8 @@ class DbController {
     const { database, collection, pipeline, cluster } = req.body;
     try {
       const Model = getModel(database, collection, cluster);
-      const result = await Model.aggregate(pipeline);
+      const processedPipeline = convertDateStrings(pipeline);
+      const result = await Model.aggregate(processedPipeline);
       if (!result || result.length === 0) {
         return res.status(404).json({ success: false, message: "No aggregation results found" });
       }
