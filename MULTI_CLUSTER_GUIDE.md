@@ -190,3 +190,6 @@ curl -X POST http://localhost:7438/api/findOne \
   -H "x-api-secret: your_secret" \
   -d '{"cluster":"production","database":"test","collection":"test","filter":{}}'
 ```
+
+## Important 
+  pm2 restart all --update-env

@@ -14,7 +14,7 @@ const API_SECRET = process.env.API_SECRET; // Load API secret from .env
 const app = express();
 
 // Trust proxy - needed when behind reverse proxy/load balancer
-app.set('trust proxy', true);
+app.set('trust proxy', 1); // nginx is the only hop; `true` lets clients spoof IPs past the rate limiter
 
 // Middleware for rate limiting
 const limiter = rateLimit({
@@ -42,11 +42,15 @@ app.get('/health', (req, res) => {
 
 // API Key Authentication Middleware
 app.use((req, res, next) => {
+  // Never log headers (they carry x-api-key/x-api-secret) or full bodies (disk growth).
+  const body = req.body || {};
   logger.info({
     method: req.method,
     url: req.originalUrl,
-    body: req.body,
-    headers: req.headers,
+    cluster: body.cluster,
+    database: body.database,
+    collection: body.collection,
+    ip: req.ip,
   });
   const apiKey = req.headers["x-api-key"];
   const apiSecret = req.headers["x-api-secret"];

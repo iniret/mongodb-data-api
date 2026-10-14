@@ -16,7 +16,8 @@ const logger = winston.createLogger({
   format: winston.format.json(),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/api.log' })
+    // Capped: an uncapped api.log filled the droplet disk (2.6G) and took the API down.
+    new winston.transports.File({ filename: 'logs/api.log', maxsize: 20 * 1024 * 1024, maxFiles: 3, tailable: true })
   ]
 });
 
